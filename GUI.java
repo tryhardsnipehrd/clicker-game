@@ -10,6 +10,10 @@ public class GUI {
     private int clickMultiplier = 1;
     private long lifetimeClicks = 0;
     private int shopMultiplier = 0;
+    private int lifetimeWithMultiplier = 0;
+    private int autoSpeed = 1;
+    private int autoClickers = 0;
+    private int autoClickerMultiplier = 1;
 
 
     private JLabel cash;
@@ -18,6 +22,20 @@ public class GUI {
     private JButton clicker;
     private JPanel panel;
     private JButton shop;
+    private JLabel lifetimeMulti;
+    private JButton upgradeAutoClickers;
+    private JButton buyAutoClickers;
+
+    // Defining the action cause I have to for this to be much easier
+    ActionListener autoClickerAction = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            lifetimeWithMultiplier += autoClickerMultiplier * autoClickers;
+            currentClicks += autoClickerMultiplier * autoClickers;
+            lifetimeMulti.setText("Lifetime Earnings: " + lifetimeWithMultiplier);
+            cash.setText("Number of clicks: "+currentClicks);
+        }
+    };
+    private Timer autoClicker = new Timer(1000/autoSpeed, autoClickerAction);
 
     public GUI() {
         // Now that everything is created, actually make them usable
@@ -26,6 +44,9 @@ public class GUI {
         shop = new JButton("Upgrade your clicks");
         clicker = new JButton("Click Me");
         lifetime = new JLabel("Lifetime clicks: "+lifetimeClicks, SwingConstants.CENTER);
+        lifetimeMulti = new JLabel("Lifetime Earnings: "+lifetimeWithMultiplier, SwingConstants.CENTER);
+        upgradeAutoClickers = new JButton("Upgrade the AutoClickers");
+        buyAutoClickers = new JButton("Buy more AutoClickers");
 
         cash = new JLabel("Number of clicks: 0", SwingConstants.CENTER);
         panel = new JPanel();
@@ -35,10 +56,12 @@ public class GUI {
                 new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
-                        currentClicks += 1 * clickMultiplier;
+                        currentClicks += clickMultiplier;
+                        lifetimeWithMultiplier += clickMultiplier;
                         lifetimeClicks++;
                         cash.setText("Number of clicks: " + currentClicks);
-                        lifetime.setText("lifetime clicks: " + lifetimeClicks);
+                        lifetime.setText("Lifetime clicks: " + lifetimeClicks);
+                        lifetimeMulti.setText("Lifetime Earnings: "+lifetimeWithMultiplier);
                     }
                 }
         );
@@ -55,15 +78,44 @@ public class GUI {
                     }
                 }
         );
+        upgradeAutoClickers.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        if (currentClicks >= 100 + (autoClickerMultiplier*100)){
+                            autoClickerMultiplier++;
+                            currentClicks-= 100 + (autoClickerMultiplier*100);
+                            cash.setText("Number of clicks: " + currentClicks);
+                        }
+                    }
+                }
+        );
+        buyAutoClickers.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        if (currentClicks >= 100 + (autoClickers*25)) {
+                            currentClicks -= 100 + (autoClickers*25);
+                            cash.setText("Number of clicks: " + currentClicks);
+                            autoClickers++;
+                            if (autoClickers==1) {
+                                autoClicker.start();
+                            }
+                        }
+                    }
+                }
+        );
 
-
+        // Actually create the window, specifically the contents of the panel
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
-        panel.setLayout(new GridLayout(4, 1));
+        panel.setLayout(new GridLayout(4, 2));
         panel.add(clicker);
         panel.add(shop);
+        panel.add(buyAutoClickers);
+        panel.add(upgradeAutoClickers);
         panel.add(cash);
         panel.add(lifetime);
+        panel.add(lifetimeMulti);
 
+        // Initialize the window with the panel, and make it visible
         frame.add(panel, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Clicker Game");
@@ -75,6 +127,7 @@ public class GUI {
 
     public static void main(String[] args) {
 
+        // Tell the program to go to the GUI instead of here, so that I can manage it better
         new GUI();
 
     }
