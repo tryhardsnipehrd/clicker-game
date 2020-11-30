@@ -2,18 +2,25 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigInteger;
+import java.util.Scanner;
 
 public class GUI {
     //Define everything for later, this is gonna get crazy
 
-    private long currentClicks = 0;
-    private int clickMultiplier = 1;
-    private long lifetimeClicks = 0;
-    private int shopMultiplier = 0;
-    private int lifetimeWithMultiplier = 0;
+    private BigInteger currentClicks = new BigInteger("0");
+    private BigInteger clickMultiplier = new BigInteger("1");
+    private BigInteger lifetimeClicks = new BigInteger("0");
+    private BigInteger shopMultiplier = new BigInteger("0");
+    private BigInteger lifetimeWithMultiplier = new BigInteger("0");
     private int autoSpeed = 1;
-    private int autoClickers = 0;
-    private int autoClickerMultiplier = 1;
+    private BigInteger autoClickers = new BigInteger("0");
+    private BigInteger autoClickerMultiplier = new BigInteger("1");
+    private final BigInteger one = new BigInteger("1");
+    private final BigInteger hundred = new BigInteger("100");
+    private final BigInteger fifty = new BigInteger("50");
+    private final BigInteger twentyFive = new BigInteger("25");
+    private int compareThing;
 
 
     private JLabel cash;
@@ -29,8 +36,8 @@ public class GUI {
     // Defining the action cause I have to for this to be much easier
     ActionListener autoClickerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            lifetimeWithMultiplier += autoClickerMultiplier * autoClickers;
-            currentClicks += autoClickerMultiplier * autoClickers;
+            lifetimeWithMultiplier = lifetimeWithMultiplier.add(autoClickerMultiplier.multiply(autoClickers));
+            currentClicks = currentClicks.add(autoClickerMultiplier.multiply(autoClickers));
             lifetimeMulti.setText("Lifetime Earnings: " + lifetimeWithMultiplier);
             cash.setText("Number of clicks: "+currentClicks);
         }
@@ -56,24 +63,26 @@ public class GUI {
                 new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
-                        currentClicks += clickMultiplier;
-                        lifetimeWithMultiplier += clickMultiplier;
-                        lifetimeClicks++;
+                        currentClicks = currentClicks.add(clickMultiplier);
+                        lifetimeWithMultiplier = lifetimeWithMultiplier.add(clickMultiplier);
+                        lifetimeClicks = lifetimeClicks.add(one);
                         cash.setText("Number of clicks: " + currentClicks);
                         lifetime.setText("Lifetime clicks: " + lifetimeClicks);
                         lifetimeMulti.setText("Lifetime Earnings: "+lifetimeWithMultiplier);
+                        System.out.println(currentClicks);
                     }
                 }
         );
         shop.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (currentClicks >= 100+(50*shopMultiplier)){
-                            currentClicks -= 100 + (50*shopMultiplier);
+                        compareThing = currentClicks.compareTo(hundred.add(fifty.multiply(shopMultiplier)));
+                        if (compareThing == -1){
+                            currentClicks = currentClicks.subtract(hundred.add(fifty.multiply(shopMultiplier)));
                             cash.setText("Number of clicks: " + currentClicks);
                             shop.setText("Upgrade your clicks: "+clickMultiplier);
-                            shopMultiplier++;
-                            clickMultiplier++;
+                            shopMultiplier = shopMultiplier.add(one);
+                            clickMultiplier = clickMultiplier.add(one);
                         }
 
                     }
@@ -82,11 +91,12 @@ public class GUI {
         upgradeAutoClickers.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (currentClicks >= 100 + (autoClickerMultiplier*100)){
-                            currentClicks-= 100 + (autoClickerMultiplier*100);
+                        compareThing = currentClicks.compareTo(hundred.add(hundred.multiply(autoClickerMultiplier)));
+                        if (compareThing == -1){
+                            currentClicks = currentClicks.subtract(hundred.add(hundred.multiply(autoClickerMultiplier)));
                             cash.setText("Number of clicks: " + currentClicks);
                             upgradeAutoClickers.setText("Upgrade AutoClickers: "+autoClickerMultiplier);
-                            autoClickerMultiplier++;
+                            autoClickerMultiplier = autoClickerMultiplier.add(one);
                         }
                     }
                 }
@@ -94,12 +104,13 @@ public class GUI {
         buyAutoClickers.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (currentClicks >= 100 + (autoClickers*25)) {
-                            currentClicks -= 100 + (autoClickers*25);
+                        compareThing = currentClicks.compareTo(hundred.add(twentyFive.multiply(autoClickers)));
+                        if (compareThing == -1) {
+                            currentClicks = currentClicks.subtract(hundred.add(twentyFive.multiply(autoClickers)));
                             cash.setText("Number of clicks: " + currentClicks);
                             buyAutoClickers.setText("Buy more AutoClickers: "+autoClickers);
-                            autoClickers++;
-                            if (autoClickers==1) {
+                            autoClickers = autoClickers.add(one);
+                            if (autoClickers==one) {
                                 autoClicker.start();
                             }
                         }
@@ -129,6 +140,8 @@ public class GUI {
     }
 
     public static void main(String[] args) {
+
+        // Anything for debugging can go here
 
         // Tell the program to go to the GUI instead of here, so that I can manage it better
         new GUI();
