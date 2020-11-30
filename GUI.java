@@ -71,6 +71,7 @@ public class GUI {
                         if (currentClicks >= 100+(50*shopMultiplier)){
                             currentClicks -= 100 + (50*shopMultiplier);
                             cash.setText("Number of clicks: " + currentClicks);
+                            shop.setText("Upgrade your clicks: "+clickMultiplier);
                             shopMultiplier++;
                             clickMultiplier++;
                         }
@@ -82,9 +83,10 @@ public class GUI {
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         if (currentClicks >= 100 + (autoClickerMultiplier*100)){
-                            autoClickerMultiplier++;
                             currentClicks-= 100 + (autoClickerMultiplier*100);
                             cash.setText("Number of clicks: " + currentClicks);
+                            upgradeAutoClickers.setText("Upgrade AutoClickers: "+autoClickerMultiplier);
+                            autoClickerMultiplier++;
                         }
                     }
                 }
@@ -95,6 +97,7 @@ public class GUI {
                         if (currentClicks >= 100 + (autoClickers*25)) {
                             currentClicks -= 100 + (autoClickers*25);
                             cash.setText("Number of clicks: " + currentClicks);
+                            buyAutoClickers.setText("Buy more AutoClickers: "+autoClickers);
                             autoClickers++;
                             if (autoClickers==1) {
                                 autoClicker.start();
