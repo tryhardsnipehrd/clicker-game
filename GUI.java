@@ -2,25 +2,28 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class GUI {
     //Define everything for later, this is gonna get crazy
 
-    private BigInteger currentClicks = new BigInteger("0");
-    private BigInteger clickMultiplier = new BigInteger("1");
-    private BigInteger lifetimeClicks = new BigInteger("0");
-    private BigInteger shopMultiplier = new BigInteger("0");
-    private BigInteger lifetimeWithMultiplier = new BigInteger("0");
+    private BigDecimal currentClicks = new BigDecimal("0");
+    private BigDecimal clickMultiplier = new BigDecimal("1");
+    private BigDecimal lifetimeClicks = new BigDecimal("0");
+    private BigDecimal shopMultiplier = new BigDecimal("0");
+    private BigDecimal lifetimeWithMultiplier = new BigDecimal("0");
     private int autoSpeed = 1;
-    private BigInteger autoClickers = new BigInteger("0");
-    private BigInteger autoClickerMultiplier = new BigInteger("1");
-    private final BigInteger one = new BigInteger("1");
-    private final BigInteger hundred = new BigInteger("100");
-    private final BigInteger fifty = new BigInteger("50");
-    private final BigInteger twentyFive = new BigInteger("25");
+    private BigDecimal autoClickers = new BigDecimal("0");
+    private BigDecimal autoClickerMultiplier = new BigDecimal("1");
+    private BigDecimal autoClickerUpgradePriceMultiplier = new BigDecimal("1");
+    private final BigDecimal one = new BigDecimal("1.0");
+    private final BigDecimal hundred = new BigDecimal("100");
+    private final BigDecimal fifty = new BigDecimal("50");
+    private final BigDecimal twentyFive = new BigDecimal("25");
+    private final BigDecimal one_half = new BigDecimal("1.5");
     private int compareThing;
+    private boolean timerStarted = false;
 
 
     private JLabel cash;
@@ -32,6 +35,7 @@ public class GUI {
     private JLabel lifetimeMulti;
     private JButton upgradeAutoClickers;
     private JButton buyAutoClickers;
+    private JLabel shopPrices;
 
     // Defining the action cause I have to for this to be much easier
     ActionListener autoClickerAction = new ActionListener() {
@@ -55,6 +59,7 @@ public class GUI {
         upgradeAutoClickers = new JButton("Upgrade the AutoClickers");
         buyAutoClickers = new JButton("Buy more AutoClickers");
 
+
         cash = new JLabel("Number of clicks: 0", SwingConstants.CENTER);
         panel = new JPanel();
         // This is where I found the answer for separate buttons
@@ -69,7 +74,7 @@ public class GUI {
                         cash.setText("Number of clicks: " + currentClicks);
                         lifetime.setText("Lifetime clicks: " + lifetimeClicks);
                         lifetimeMulti.setText("Lifetime Earnings: "+lifetimeWithMultiplier);
-                        System.out.println(currentClicks);
+                        //System.out.println(currentClicks);
                     }
                 }
         );
@@ -77,12 +82,14 @@ public class GUI {
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         compareThing = currentClicks.compareTo(hundred.add(fifty.multiply(shopMultiplier)));
-                        if (compareThing == -1){
+                        System.out.println(compareThing);
+                        if (compareThing == 1){
                             currentClicks = currentClicks.subtract(hundred.add(fifty.multiply(shopMultiplier)));
-                            cash.setText("Number of clicks: " + currentClicks);
-                            shop.setText("Upgrade your clicks: "+clickMultiplier);
                             shopMultiplier = shopMultiplier.add(one);
                             clickMultiplier = clickMultiplier.add(one);
+                            cash.setText("Number of clicks: " + currentClicks);
+                            shop.setText("Upgrade your clicks: "+clickMultiplier);
+                            //System.out.println(clickMultiplier);
                         }
 
                     }
@@ -91,12 +98,13 @@ public class GUI {
         upgradeAutoClickers.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        compareThing = currentClicks.compareTo(hundred.add(hundred.multiply(autoClickerMultiplier)));
-                        if (compareThing == -1){
-                            currentClicks = currentClicks.subtract(hundred.add(hundred.multiply(autoClickerMultiplier)));
+                        compareThing = currentClicks.compareTo(hundred.add(hundred.multiply(new BigDecimal(String.valueOf(autoClickerUpgradePriceMultiplier)))));
+                        if (compareThing == 1){
+                            currentClicks = currentClicks.subtract(hundred.add(hundred.multiply(new BigDecimal(String.valueOf(autoClickerUpgradePriceMultiplier)))));
                             cash.setText("Number of clicks: " + currentClicks);
+                            autoClickerMultiplier = autoClickerMultiplier.add(autoClickerMultiplier);
                             upgradeAutoClickers.setText("Upgrade AutoClickers: "+autoClickerMultiplier);
-                            autoClickerMultiplier = autoClickerMultiplier.add(one);
+                            autoClickerUpgradePriceMultiplier = new BigDecimal(String.valueOf(autoClickerUpgradePriceMultiplier.multiply(one_half)));
                         }
                     }
                 }
@@ -105,13 +113,15 @@ public class GUI {
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         compareThing = currentClicks.compareTo(hundred.add(twentyFive.multiply(autoClickers)));
-                        if (compareThing == -1) {
+                        if (compareThing == 1) {
                             currentClicks = currentClicks.subtract(hundred.add(twentyFive.multiply(autoClickers)));
                             cash.setText("Number of clicks: " + currentClicks);
-                            buyAutoClickers.setText("Buy more AutoClickers: "+autoClickers);
                             autoClickers = autoClickers.add(one);
-                            if (autoClickers==one) {
+                            buyAutoClickers.setText("Buy more AutoClickers: "+autoClickers);
+                            if (!timerStarted) {
                                 autoClicker.start();
+                                timerStarted = true;
+                                System.out.println("timer Started");
                             }
                         }
                     }
